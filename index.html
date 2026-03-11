@@ -68,6 +68,7 @@
     font-size: 13px;
     line-height: 1.6;
     min-height: 100vh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   /* ── Scrollbar ── */
@@ -1120,26 +1121,8 @@
       <div class="logo-sub">Especificações e Contextos Para IA</div>
     </div>
 
-    <div class="sidebar-section-label">Navegação</div>
-
-    <button class="sidebar-btn active" id="nav-all" onclick="setView('all')">
-      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="1" y="1" width="6" height="6" rx="1"/>
-        <rect x="9" y="1" width="6" height="6" rx="1"/>
-        <rect x="1" y="9" width="6" height="6" rx="1"/>
-        <rect x="9" y="9" width="6" height="6" rx="1"/>
-      </svg>
-      Todos os Cards
-    </button>
-
-    <div class="sidebar-divider"></div>
-    <div class="sidebar-section-label">Projetos</div>
-
-    <div class="sidebar-projects" id="sidebar-projects">
-      <!-- injected by JS -->
-    </div>
-
-    <div class="sidebar-divider"></div>
+    
+    <div class="sidebar-section-label">Funcionalidades</div>
 
     <button class="sidebar-btn" onclick="openExportModal()">
       <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -1168,6 +1151,26 @@
       </svg>
       Instalar App
     </button>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Navegação</div>
+
+    <button class="sidebar-btn active" id="nav-all" onclick="setView('all')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1"/>
+        <rect x="9" y="1" width="6" height="6" rx="1"/>
+        <rect x="1" y="9" width="6" height="6" rx="1"/>
+        <rect x="9" y="9" width="6" height="6" rx="1"/>
+      </svg>
+      Todos os Cards
+    </button>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Projetos</div>
+
+    <div class="sidebar-projects" id="sidebar-projects">
+      <!-- injected by JS -->
+    </div>
   </aside>
 
   <!-- ══════════════════════ MAIN ══════════════════════ -->
@@ -2775,11 +2778,33 @@ if ('serviceWorker' in navigator) {
 
 // ── PWA Install Prompt ──
 let deferredPrompt;
+const PWA_INSTALL_KEY = 'spec-flow-install-status';
+
+// Verificar localStorage na primeira visita
+function checkPWAInstallStatus() {
+  const status = localStorage.getItem(PWA_INSTALL_KEY);
+  return status || 'never-asked'; // 'never-asked' | 'installed' | 'dismissed'
+}
+
+function setPWAInstallStatus(status) {
+  localStorage.setItem(PWA_INSTALL_KEY, status);
+}
+
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
+  const status = checkPWAInstallStatus();
+  
   const btn = document.getElementById('install-pwa-btn');
-  if (btn) btn.style.display = 'flex';
+  if (btn) {
+    btn.style.display = 'flex';
+    
+    // Mostrar notificação na primeira visita
+    if (status === 'never-asked') {
+      showInstallNotification();
+      setPWAInstallStatus('prompted-once');
+    }
+  }
 });
 
 function installPWA() {
@@ -2788,6 +2813,9 @@ function installPWA() {
   deferredPrompt.userChoice.then(choice => {
     if (choice.outcome === 'accepted') {
       console.log('PWA instalado com sucesso');
+      setPWAInstallStatus('installed');
+    } else {
+      setPWAInstallStatus('dismissed');
     }
     deferredPrompt = null;
     const btn = document.getElementById('install-pwa-btn');
@@ -2795,8 +2823,54 @@ function installPWA() {
   });
 }
 
+function showInstallNotification() {
+  // Verifica se existe um container de notificações
+  let notifContainer = document.getElementById('install-notification');
+  if (!notifContainer) {
+    notifContainer = document.createElement('div');
+    notifContainer.id = 'install-notification';
+    notifContainer.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--ink);
+      color: white;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      font-size: 13px;
+      max-width: 300px;
+      z-index: 9999;
+      animation: slideIn 0.3s ease-out;
+      font-family: var(--font-body);
+    `;
+    notifContainer.innerHTML = `
+      <strong>Instalar App</strong><br>
+      <small>Instale o SpecFlow para acessar offline</small>
+    `;
+    document.body.appendChild(notifContainer);
+    
+    // Adicionar animação
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Auto-remover após 5s
+    setTimeout(() => {
+      notifContainer.style.animation = 'slideIn 0.3s ease-out reverse';
+      setTimeout(() => notifContainer.remove(), 300);
+    }, 5000);
+  }
+}
+
 window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
+  setPWAInstallStatus('installed');
   const btn = document.getElementById('install-pwa-btn');
   if (btn) btn.style.display = 'none';
 });
