@@ -1152,6 +1152,13 @@
       Instalar App
     </button>
 
+    <button class="sidebar-btn" onclick="clearAllData()">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 4h12M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M3 4v10a1 1 0 001 1h8a1 1 0 001-1V4M6 7v4M10 7v4"/>
+      </svg>
+      Limpar Tudo
+    </button>
+
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-label">Navegação</div>
 
@@ -2874,6 +2881,46 @@ window.addEventListener('appinstalled', () => {
   const btn = document.getElementById('install-pwa-btn');
   if (btn) btn.style.display = 'none';
 });
+
+// ── Clear all data from localStorage ──
+function clearAllData() {
+  const confirmed = confirm(
+    '⚠️ ATENÇÃO!\n\n' +
+    'Isso irá apagar TODOS os dados locais:\n\n' +
+    '• Todos os cards (especificações)\n' +
+    '• Todos os projetos\n' +
+    '• Tags customizadas\n' +
+    '• Configurações salvas\n' +
+    '• Status de instalação do PWA\n\n' +
+    'Esta ação NÃO pode ser desfeita!\n\n' +
+    'Tem certeza?'
+  );
+  
+  if (!confirmed) return;
+  
+  try {
+    localStorage.clear();
+    // Limpar state também
+    state = {
+      cards: [],
+      projects: [],
+      customTags: [],
+      activeTagFilters: [],
+      activeProjectFilter: null,
+      editingId: null,
+      viewingId: null
+    };
+    
+    // Recarregar a página
+    setTimeout(() => {
+      location.reload();
+    }, 300);
+    
+    alert('✓ Todos os dados foram apagados com sucesso!');
+  } catch (e) {
+    alert('❌ Erro ao limpar dados: ' + e.message);
+  }
+}
 </script>
 </body>
 </html>
