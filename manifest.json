@@ -1,0 +1,36 @@
+{
+  "name": "SpecFlow — Gestão de Especificações e Contextos Para IA",
+  "short_name": "SpecFlow",
+  "description": "Cadastre, organize e exporte especificações de projetos como artefatos prontos para uso com IA geradora de código.",
+  "start_url": "/SpecFlow/",
+  "scope": "/SpecFlow/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#111110",
+  "theme_color": "#111110",
+  "lang": "pt-BR",
+  "categories": ["productivity", "developer tools"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Novo Card",
+      "short_name": "Novo Card",
+      "description": "Criar um novo card de especificação",
+      "url": "/SpecFlow/",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

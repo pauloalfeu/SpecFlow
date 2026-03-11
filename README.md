@@ -1,219 +1,65 @@
 # SpecFlow
 
-> Cadastre, organize e exporte especificações de projetos como artefatos prontos para uso com IA geradora de código.
+> Pare de jogar contexto vago pra IA e torcer pro melhor.
+
+SpecFlow é uma ferramenta para quem usa IA pra gerar código e cansou de reexplicar o projeto do zero toda vez. Você documenta as especificações em cards, organiza por projeto e tag, e na hora de codar exporta tudo num Markdown estruturado — pronto pra colar no ChatGPT, Claude, Gemini ou o que vier.
+
+Sem backend. Sem conta. Sem instalação. Funciona direto no browser e pode ser instalado como PWA no celular.
 
 ---
 
-## O que é
+## A lógica é simples
 
-SpecFlow é uma ferramenta pessoal de gestão de especificações técnicas, pensada para quem desenvolve projetos de software e quer documentar ideias, requisitos e decisões de forma incremental — sem fricção, sem servidor, sem banco de dados.
-
-A ideia central é simples: você cadastra **cards de especificação** ao longo do desenvolvimento, polindo cada um conforme o projeto evolui, e quando precisar gerar código com uma IA (ChatGPT, Claude, Gemini, etc.), exporta tudo em um único arquivo **Markdown estruturado** — organizado, indexado e pronto para ser colado no contexto da IA.
-
----
-
-## Intenção e filosofia
-
-SpecFlow não é um gestor de tarefas, não é um wiki e não é um editor de documentos. É uma ferramenta de **pensamento estruturado para developers** que usam IA como copiloto de código.
-
-A premissa é que a qualidade do código gerado por uma IA é diretamente proporcional à qualidade do contexto que você fornece. Um Markdown bem estruturado, com stack declarada, dependências entre componentes mapeadas e regras de implementação claras, produz resultados dramaticamente melhores do que um prompt vago.
-
-O fluxo de uso típico é:
-
-1. Você tem uma ideia ou decisão técnica → cria um card
-2. A ideia evolui → edita o card
-3. Decidiu que não faz parte do escopo → apaga
+1. Teve uma ideia ou decisão técnica → cria um card
+2. A coisa evoluiu → edita
+3. Saiu do escopo → apaga
 4. Hora de codar → exporta o Markdown, cola na IA, recebe código alinhado com as suas specs
 
-O SpecFlow é a ponte entre "tenho uma ideia na cabeça" e "tenho um documento que a IA consegue usar".
+A qualidade do que a IA gera é proporcional ao contexto que você dá. O SpecFlow existe pra esse contexto ser bom.
 
 ---
 
-## 🚀 [Acessar o SpecFlow → pauloalfeu.github.io/SpecFlow](https://pauloalfeu.github.io/SpecFlow/)
+## 🚀 [Abrir o SpecFlow → pauloalfeu.github.io/SpecFlow](https://pauloalfeu.github.io/SpecFlow/)
 
 ---
 
-## Por que existe
+## O que tem dentro
 
-Documentar um MVP do zero é tedioso. Mas passar um contexto vago para uma IA e esperar código preciso é frustrante. O SpecFlow resolve esse meio-termo: ele te força a pensar e registrar as especificações em pequenos pedaços reutilizáveis (os cards), e depois monta o documento completo automaticamente, na ordem certa, com o contexto certo.
+**Cards** com título, descrição, regras de implementação, notas, prioridade (alta/média/baixa), tags, projetos e dependências entre cards.
 
----
+**23 tags nativas** cobrindo os casos mais comuns: `MVP` · `Req. Funcional` · `Req. Não-Funcional` · `Front-end` · `Back-end` · `API` · `Banco de Dados` · `Auth` · `Regra de Negócio` · `UI` · `UX` · `Infra` · `Deploy` · `Testes` · `Segurança` · `Performance` · `Mobile` · `Integrações` · `Dados` · `Tecnologia` · `Dev Experience` · `Documentação` · `Misc` — mais tags personalizadas com cor à sua escolha.
 
-## Funcionalidades
+**Projetos** com nome, descrição e stack declarada (ex: `Django 4.2, PostgreSQL, React`). A stack vai direto pro topo do Markdown exportado como contexto pra IA.
 
-### Cards de especificação
-Cada card tem os seguintes campos:
+**Filtros** por projeto, tag, texto livre e ordenação. A sidebar no desktop vira um menu drawer no mobile.
 
-- **Título** — identificador curto e direto
-- **Projeto(s)** — um card pode pertencer a múltiplos projetos simultaneamente
-- **Tags / Categorias** — seleção múltipla entre 23 categorias nativas (veja abaixo) + tags personalizadas
-- **Descrição Geral e Conteúdo** — o corpo da especificação, com suporte a Markdown
-- **Regras de Implementação** — restrições, comportamentos esperados, checklist
-- **Depende de** — vincula o card a outros cards dos quais ele depende; gera referências cruzadas no Markdown exportado
-- **Prioridade** — Alta, Média ou Baixa
-- **Notas / Referências** — links, contexto adicional, referências externas
+**Exportação Markdown** com índice automático, agrupamento por categoria, referências cruzadas de dependências e toggle de datas. Copia direto ou baixa como `.md`.
 
-### Tags nativas (23)
-`Req. Funcional` · `Req. Não-Funcional` · `UI / Interface` · `UX / Experiência` · `Front-end` · `Back-end` · `Banco de Dados` · `API / Endpoint` · `Autenticação` · `Regra de Negócio` · `Tecnologia` · `MVP / Escopo` · `Infraestrutura` · `Testes / QA` · `Performance` · `Segurança` · `Mobile` · `Integrações` · `Dados / Analytics` · `Dev Experience` · `Deploy / CI/CD` · `Documentação` · `Misc / Outros`
-
-### Tags personalizadas
-Crie suas próprias tags com nome e cor escolhida. O sistema verifica duplicatas antes de criar. Tags personalizadas ficam disponíveis em todos os cards e são salvas junto com os dados.
-
-### Projetos
-Cada projeto pode ter:
-- Nome
-- Descrição geral
-- Stack principal (ex: `Django 4.2, PostgreSQL, React, Celery`)
-
-A stack aparece no topo do Markdown exportado como contexto global para a IA. Um card pode pertencer a mais de um projeto, o que permite criar especificações genéricas reaproveitáveis (ex: "Autenticação com JWT") e associá-las a múltiplos projetos.
-
-### Navegação e filtros
-- Sidebar com acesso rápido a todos os cards ou por projeto
-- Filtro por tags na barra superior (mostra apenas as tags presentes nos cards visíveis)
-- Busca por texto em título, descrição e notas
-- Ordenação por mais recente, mais antigo ou alfabética
-
-### Exportação Markdown
-O arquivo `.md` gerado é estruturado para maximizar a utilidade com IAs geradoras de código:
-
-- **Seção de Contexto do Projeto** — nome, descrição e stack no topo
-- **Índice automático** com âncoras e contagem de cards por seção
-- **Agrupamento por tag primária** em ordem lógica (MVP → Regras de Negócio → RF → RNF → Front-end → Back-end → ...)
-- **Ordenação por conectividade** — cards com mais tags em comum ficam próximos dentro de cada seção
-- **Referências cruzadas** de dependências entre cards (`Depende de: [Nome do Card]`)
-- **Toggle de datas** — inclua ou omita metadados de criação conforme necessidade
-- **Filtro por projeto** — exporte só o que é relevante para um projeto específico
-- **Copiar para área de transferência** ou **baixar como arquivo `.md`**
+**Backup portável** — exporte seus dados como `.json` e importe em qualquer outro dispositivo. Pode importar múltiplos arquivos de uma vez; o app mescla tudo sem duplicatas (compara por ID e por título).
 
 ---
 
-## Persistência
+## Dados e offline
 
-Todos os dados (cards, projetos, tags personalizadas) são salvos no `localStorage` do navegador. Não há backend, não há conta, não há nuvem. Isso significa:
+Tudo fica no `localStorage` do navegador — sem nuvem, sem servidor. O app funciona 100% offline depois da primeira visita (graças ao Service Worker). Por isso os dados são por dispositivo: use o backup `.json` pra carregar de um lugar pro outro.
 
-- Funciona 100% offline após o carregamento inicial
-- Ideal para hospedar no GitHub Pages sem nenhuma infraestrutura
-- Os dados ficam no dispositivo/navegador onde foram criados
-
-> **Atenção:** limpar os dados do navegador apaga tudo. Para backup, exporte o Markdown periodicamente.
+> Limpar os dados do browser apaga tudo. Faça backup antes.
 
 ---
 
-## Atalhos de teclado
+## Instalação como PWA
+
+No Chrome ou Safari mobile, ao acessar o link aparece a opção "Adicionar à tela inicial". O app abre em tela cheia, sem barra do navegador, como se fosse nativo.
+
+---
+
+## Atalhos
 
 | Tecla | Ação |
 |-------|------|
-| `N` | Novo card (quando nenhum input está focado) |
-| `Esc` | Fecha o modal aberto |
+| `N` | Novo card |
+| `Esc` | Fecha o modal |
 
 ---
 
-> **Disclaimer técnico:** o SpecFlow é intencionalmente um único arquivo `index.html` sem dependências locais, sem frameworks e sem build step — HTML, CSS e JavaScript vanilla, com fontes via Google Fonts e persistência via `localStorage`. Toda a lógica, interface e exportação vivem em menos de 2.500 linhas de código num arquivo só.
-
-
-> Cadastre, organize e exporte especificações de projetos como artefatos prontos para uso com IA geradora de código.
-
----
-
-## O que é
-
-SpecFlow é uma ferramenta pessoal de gestão de especificações técnicas, pensada para quem desenvolve projetos de software e quer documentar ideias, requisitos e decisões de forma incremental — sem fricção, sem servidor, sem banco de dados.
-
-A ideia central é simples: você cadastra **cards de especificação** ao longo do desenvolvimento, polindo cada um conforme o projeto evolui, e quando precisar gerar código com uma IA (ChatGPT, Claude, Gemini, etc.), exporta tudo em um único arquivo **Markdown estruturado** — organizado, indexado e pronto para ser colado no contexto da IA.
-
----
-
-## Por que existe
-
-Documentar um MVP do zero é tedioso. Mas passar um contexto vago para uma IA e esperar código preciso é frustrante. O SpecFlow resolve esse meio-termo: ele te força a pensar e registrar as especificações em pequenos pedaços reutilizáveis (os cards), e depois monta o documento completo automaticamente, na ordem certa, com o contexto certo.
-
-O fluxo de uso típico é:
-
-1. Você tem uma ideia ou decisão técnica → cria um card
-2. A ideia evolui → edita o card
-3. Decidiu que não faz parte do escopo → apaga
-4. Hora de codar → exporta o Markdown, cola na IA, recebe código alinhado com as suas specs
-
----
-
-## Funcionalidades
-
-### Cards de especificação
-Cada card tem os seguintes campos:
-
-- **Título** — identificador curto e direto
-- **Projeto(s)** — um card pode pertencer a múltiplos projetos simultaneamente
-- **Tags / Categorias** — seleção múltipla entre 23 categorias nativas (veja abaixo) + tags personalizadas
-- **Descrição Geral e Conteúdo** — o corpo da especificação, com suporte a Markdown
-- **Regras de Implementação** — restrições, comportamentos esperados, checklist
-- **Depende de** — vincula o card a outros cards dos quais ele depende; gera referências cruzadas no Markdown exportado
-- **Prioridade** — Alta, Média ou Baixa
-- **Notas / Referências** — links, contexto adicional, referências externas
-
-### Tags nativas (23)
-`Req. Funcional` · `Req. Não-Funcional` · `UI / Interface` · `UX / Experiência` · `Front-end` · `Back-end` · `Banco de Dados` · `API / Endpoint` · `Autenticação` · `Regra de Negócio` · `Tecnologia` · `MVP / Escopo` · `Infraestrutura` · `Testes / QA` · `Performance` · `Segurança` · `Mobile` · `Integrações` · `Dados / Analytics` · `Dev Experience` · `Deploy / CI/CD` · `Documentação` · `Misc / Outros`
-
-### Tags personalizadas
-Crie suas próprias tags com nome e cor escolhida. O sistema verifica duplicatas antes de criar. Tags personalizadas ficam disponíveis em todos os cards e são salvas junto com os dados.
-
-### Projetos
-Cada projeto pode ter:
-- Nome
-- Descrição geral
-- Stack principal (ex: `Django 4.2, PostgreSQL, React, Celery`)
-
-A stack aparece no topo do Markdown exportado como contexto global para a IA. Um card pode pertencer a mais de um projeto, o que permite criar especificações genéricas reaproveitáveis (ex: "Autenticação com JWT") e associá-las a múltiplos projetos.
-
-### Navegação e filtros
-- Sidebar com acesso rápido a todos os cards ou por projeto
-- Filtro por tags na barra superior (mostra apenas as tags presentes nos cards visíveis)
-- Busca por texto em título, descrição e notas
-- Ordenação por mais recente, mais antigo ou alfabética
-
-### Exportação Markdown
-O arquivo `.md` gerado é estruturado para maximizar a utilidade com IAs geradoras de código:
-
-- **Seção de Contexto do Projeto** — nome, descrição e stack no topo
-- **Índice automático** com âncoras e contagem de cards por seção
-- **Agrupamento por tag primária** em ordem lógica (MVP → Regras de Negócio → RF → RNF → Front-end → Back-end → ...)
-- **Ordenação por conectividade** — cards com mais tags em comum ficam próximos dentro de cada seção
-- **Referências cruzadas** de dependências entre cards (`Depende de: [Nome do Card]`)
-- **Toggle de datas** — inclua ou omita metadados de criação conforme necessidade
-- **Filtro por projeto** — exporte só o que é relevante para um projeto específico
-- **Copiar para área de transferência** ou **baixar como arquivo `.md`**
-
----
-
-## Persistência
-
-Todos os dados (cards, projetos, tags personalizadas) são salvos no `localStorage` do navegador. Não há backend, não há conta, não há nuvem. Isso significa:
-
-- Funciona 100% offline após o carregamento inicial
-- Ideal para hospedar no GitHub Pages sem nenhuma infraestrutura
-- Os dados ficam no dispositivo/navegador onde foram criados
-
-> **Atenção:** limpar os dados do navegador apaga tudo. Para backup, exporte o Markdown periodicamente ou salve o `localStorage` manualmente se necessário.
-
----
-
-## Como usar
-
-### GitHub Pages (recomendado)
-
-1. Faça um fork deste repositório ou crie um novo
-2. Suba o arquivo `index.html` na raiz
-3. Vá em **Settings → Pages** e ative para a branch `main`
-4. Acesse pelo link gerado pelo GitHub Pages
-
-### Local
-
-Basta abrir o `index.html` diretamente no navegador. Nenhuma dependência, nenhum build.
-
----
-
-## Atalhos de teclado
-
-| Tecla | Ação |
-|-------|------|
-| `N` | Novo card (quando nenhum input está focado) |
-| `Esc` | Fecha o modal aberto |
+> **Nota técnica:** arquivo único `index.html` + `manifest.json` + `sw.js` + dois ícones. HTML, CSS e JS vanilla. Sem framework, sem build, sem dependências locais.

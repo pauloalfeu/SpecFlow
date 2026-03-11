@@ -1,0 +1,2770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpecFlow — Gestão de Especificações e Contextos Para IA</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111110">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SpecFlow">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+<!-- SEO / OG -->
+<meta name="description" content="Cadastre, organize e exporte especificações de projetos como artefatos prontos para uso com IA geradora de código.">
+<meta property="og:title" content="SpecFlow — Gestão de Especificações e Contextos Para IA">
+<meta property="og:description" content="Cadastre, organize e exporte especificações de projetos como artefatos prontos para uso com IA geradora de código.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DESIGN SYSTEM — SpecFlow
+     Aesthetic: Editorial tech-noir · isometric geometry accents
+     Palette: Off-white canvas · ink black · acid-lime highlight
+  ============================================================ */
+  :root {
+    --bg:         #F2F0EB;
+    --surface:    #FFFFFF;
+    --border:     #D8D4CC;
+    --border-2:   #E8E4DC;
+    --ink:        #111110;
+    --ink-2:      #555450;
+    --ink-3:      #999692;
+    --lime:       #C6F135;
+    --lime-dark:  #9DC420;
+    --lime-bg:    #F0FAD0;
+    --red:        #FF4545;
+    --blue:       #3B82F6;
+    --amber:      #F59E0B;
+    --purple:     #8B5CF6;
+    --teal:       #14B8A6;
+    --rose:       #F43F5E;
+    --orange:     #F97316;
+
+    --radius:     10px;
+    --radius-lg:  16px;
+    --shadow:     0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    --shadow-lg:  0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+
+    --font-display: 'Syne', sans-serif;
+    --font-body:    'DM Mono', monospace;
+    --font-serif:   'Instrument Serif', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ============================================================ LAYOUT */
+  .app { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    margin-bottom: 16px;
+  }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--lime);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .logo-mark svg { width: 20px; height: 20px; }
+
+  .logo-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.4px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,.35);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .sidebar-section-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.25);
+    padding: 0 20px;
+    margin: 12px 0 6px;
+  }
+
+  .sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    border-radius: 0;
+    transition: all .15s;
+    position: relative;
+  }
+
+  .sidebar-btn:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.05); }
+
+  .sidebar-btn.active {
+    color: var(--lime);
+    background: rgba(198,241,53,.08);
+  }
+
+  .sidebar-btn.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--lime);
+  }
+
+  .sidebar-btn .icon { width: 14px; height: 14px; opacity: .7; flex-shrink: 0; }
+
+  .sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,.08);
+    margin: 12px 20px;
+  }
+
+  .sidebar-projects {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .project-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    font-size: 11.5px;
+    color: rgba(255,255,255,.5);
+    cursor: pointer;
+    transition: all .15s;
+    border-radius: 0;
+  }
+
+  .project-item:hover { color: rgba(255,255,255,.85); background: rgba(255,255,255,.04); }
+
+  .project-item.active { color: rgba(255,255,255,.9); }
+
+  .project-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .project-count {
+    margin-left: auto;
+    font-size: 10px;
+    color: rgba(255,255,255,.25);
+    background: rgba(255,255,255,.07);
+    padding: 1px 5px;
+    border-radius: 10px;
+  }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .topbar-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+
+  .search-wrap {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px; top: 50%;
+    transform: translateY(-50%);
+    width: 13px; height: 13px;
+    color: var(--ink-3);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 7px 12px 7px 30px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+  }
+
+  .search-input:focus { border-color: var(--ink-3); }
+  .search-input::placeholder { color: var(--ink-3); }
+
+  .topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .btn svg { width: 13px; height: 13px; }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--lime);
+  }
+  .btn-primary:hover { background: #2a2a28; }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--ink-2);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--border-2); border-color: var(--ink-3); }
+
+  .btn-ghost {
+    background: none;
+    color: var(--ink-2);
+    padding: 7px 10px;
+  }
+  .btn-ghost:hover { background: var(--bg); color: var(--ink); }
+
+  .btn-lime {
+    background: var(--lime);
+    color: var(--ink);
+  }
+  .btn-lime:hover { background: var(--lime-dark); }
+
+  .btn-danger {
+    background: #FEE2E2;
+    color: var(--red);
+  }
+  .btn-danger:hover { background: #FECACA; }
+
+  /* ── Filter bar ── */
+  .filter-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-2);
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-size: 10px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-right: 4px;
+  }
+
+  .tag-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .15s;
+    background: var(--bg);
+    color: var(--ink-2);
+    border-color: var(--border);
+  }
+
+  .tag-filter:hover { border-color: var(--ink-3); color: var(--ink); }
+  .tag-filter.active { background: var(--ink); color: var(--lime); border-color: var(--ink); }
+
+  .tag-filter .dot { width: 5px; height: 5px; border-radius: 50%; }
+
+  .sort-select {
+    margin-left: auto;
+    padding: 5px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--ink-2);
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* ── Cards grid ── */
+  .content {
+    padding: 24px 28px;
+    flex: 1;
+  }
+
+  .cards-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .cards-count {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--ink-3);
+    transform: translateY(-1px);
+  }
+
+  .card-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .card-menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-3);
+    padding: 2px 4px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity .15s;
+    flex-shrink: 0;
+  }
+
+  .card:hover .card-menu-btn { opacity: 1; }
+  .card-menu-btn:hover { color: var(--ink); background: var(--bg); }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .1px;
+  }
+
+  .tag-dot { width: 4px; height: 4px; border-radius: 50%; }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-2);
+    padding-top: 10px;
+    gap: 8px;
+  }
+
+  .card-project {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+
+  .card-project-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .card-date {
+    font-size: 10px;
+    color: var(--ink-3);
+    font-style: italic;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .empty-iso {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    opacity: .25;
+  }
+
+  .empty-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .empty-sub {
+    font-size: 12px;
+    color: var(--ink-3);
+    max-width: 280px;
+    line-height: 1.7;
+  }
+
+  /* ============================================================ MODAL */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,17,16,.5);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+
+  .overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: scale(.96) translateY(10px);
+    transition: transform .2s;
+  }
+
+  .overlay.open .modal { transform: scale(1) translateY(0); }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+
+  .modal-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border-2);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+  }
+
+  /* ── Form fields ── */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .field-hint { font-size: 10px; color: var(--ink-3); margin-top: 3px; }
+
+  .input, .textarea, .select {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+
+  .input:focus, .textarea:focus, .select:focus {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(17,17,16,.06);
+  }
+
+  .textarea { resize: vertical; min-height: 90px; }
+
+  /* ── Tag picker ── */
+  .tag-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  .tag-pick-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .12s;
+    user-select: none;
+  }
+
+  .tag-pick-item.selected { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+  /* ── Project picker ── */
+  .project-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: var(--radius);
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink-2);
+    transition: all .12s;
+  }
+
+  .project-chip.selected {
+    background: var(--ink);
+    color: var(--lime);
+    border-color: var(--ink);
+  }
+
+  .project-chip:hover:not(.selected) { border-color: var(--ink-3); color: var(--ink); }
+
+  .new-project-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  /* ── View modal ── */
+  .view-modal {
+    max-width: 700px;
+  }
+
+  .view-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+
+  .view-content {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    background: var(--bg);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+
+  .view-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .view-meta-item { display: flex; flex-direction: column; gap: 3px; }
+
+  .view-meta-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--ink-3);
+  }
+
+  .view-meta-value {
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  /* ── Export modal ── */
+  .export-modal { max-width: 560px; }
+
+  .export-preview {
+    background: #1a1a18;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: #c8c4bc;
+    line-height: 1.7;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  .export-preview .md-h1 { color: var(--lime); font-weight: 600; }
+  .export-preview .md-h2 { color: #9DC420; }
+  .export-preview .md-h3 { color: #a8c4a0; }
+  .export-preview .md-bold { color: #e8e4dc; font-weight: 600; }
+  .export-preview .md-tag { color: #7dd3fc; }
+
+  /* ── Notification ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--ink);
+    color: var(--lime);
+    padding: 12px 18px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-family: var(--font-body);
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all .25s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── Isometric decorative element ── */
+  .iso-deco {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: .04;
+    pointer-events: none;
+  }
+
+  /* ============================================================ TAG COLORS */
+  .tag-rf    { background: #EFF6FF; color: #2563EB; }
+  .tag-rnf   { background: #F0FDF4; color: #16A34A; }
+  .tag-ui    { background: #FFF7ED; color: #C2410C; }
+  .tag-ux    { background: #FFF1F2; color: #BE123C; }
+  .tag-front { background: #F5F3FF; color: #7C3AED; }
+  .tag-back  { background: #ECFDF5; color: #065F46; }
+  .tag-db    { background: #FFF7ED; color: #C2410C; }
+  .tag-api   { background: #F0F9FF; color: #0369A1; }
+  .tag-auth  { background: #FDF4FF; color: #86198F; }
+  .tag-rn    { background: #FFFBEB; color: #92400E; }
+  .tag-tec   { background: #F1F5F9; color: #334155; }
+  .tag-mvp   { background: #FFF1F2; color: #BE123C; }
+  .tag-infra { background: #F0FDF4; color: #166534; }
+  .tag-test  { background: #FAFAF5; color: #5a5a30; }
+  .tag-perf  { background: #FFF8F0; color: #9a5800; }
+  .tag-seg   { background: #F5F0FF; color: #5b21b6; }
+  .tag-mob   { background: #F0F9FF; color: #0c4a6e; }
+  .tag-int   { background: #F0FFF4; color: #065f2e; }
+  .tag-dados { background: #EEF2FF; color: #3730a3; }
+  .tag-devx  { background: #FDF2F8; color: #9d174d; }
+  .tag-deploy{ background: #F1FCF9; color: #065147; }
+  .tag-doc   { background: #FAFAF5; color: #374151; }
+  .tag-misc  { background: #F9F9F9; color: #555550; }
+
+  /* ── Utilities ── */
+  .hidden { display: none !important; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .gap-2 { gap: 8px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 300;
+      transform: translateX(-100%);
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+      box-shadow: none;
+    }
+    .sidebar.mobile-open {
+      transform: translateX(0);
+      box-shadow: 4px 0 32px rgba(0,0,0,.3);
+    }
+    .sidebar-backdrop {
+      display: block;
+    }
+    .content { padding: 16px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 12px 16px; }
+    .filter-bar { padding: 8px 16px; }
+    .fab { bottom: 20px; right: 16px; padding: 13px 18px; font-size: 12px; }
+  }
+
+  @media (min-width: 769px) {
+    .hamburger-btn { display: none !important; }
+    .sidebar-backdrop { display: none !important; }
+  }
+
+  /* Sidebar backdrop (mobile only) */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 299;
+    backdrop-filter: blur(2px);
+  }
+
+  /* Hamburger button */
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 36px; height: 36px;
+    background: var(--ink);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    padding: 8px;
+    flex-shrink: 0;
+    transition: background .15s;
+  }
+  .hamburger-btn:hover { background: #2a2a28; }
+  .hamburger-btn span {
+    display: block;
+    height: 2px;
+    background: var(--lime);
+    border-radius: 2px;
+    transition: all .2s;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card { animation: fadeIn .2s ease both; }
+
+  .card-actions {
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+
+  .card:hover .card-actions { opacity: 1; }
+
+  .action-btn {
+    padding: 4px 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--ink-2);
+    transition: all .12s;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--font-body);
+  }
+
+  .action-btn:hover { background: var(--ink); color: var(--lime); border-color: var(--ink); }
+
+  .action-btn.delete:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+  /* Confirm dialog */
+  .confirm-dialog {
+    padding: 16px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .confirm-dialog p { font-size: 13px; color: var(--ink-2); max-width: 300px; }
+
+  /* ── FAB — Floating Action Button ── */
+  .fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--ink);
+    color: var(--lime);
+    border: none;
+    border-radius: 50px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,.28), 0 1px 4px rgba(0,0,0,.12);
+    transition: all .2s;
+    letter-spacing: -.1px;
+  }
+
+  .fab:hover {
+    background: #222220;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,0,0,.35);
+  }
+
+  .fab:active { transform: translateY(0); }
+
+  .fab svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .fab-pulse {
+    width: 8px; height: 8px;
+    background: var(--lime);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .5; transform: scale(.7); }
+  }
+
+  /* ── Tag custom color picker ── */
+  .tag-color-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .tag-color-swatch {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all .12s;
+    flex-shrink: 0;
+  }
+
+  .tag-color-swatch.selected { border-color: var(--ink); transform: scale(1.2); }
+
+  /* ── Custom tag display ── */
+  .tag-custom { background: #F5F5F0; color: #3a3a38; border: 1px solid #ddd; }
+
+  /* ── Backup / Restore ── */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .dropzone:hover, .dropzone.drag-over {
+    border-color: var(--ink);
+    background: #EEECEA;
+  }
+
+  .dropzone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .dropzone-icon { font-size: 28px; margin-bottom: 8px; }
+
+  .dropzone-label {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .dropzone-sub { font-size: 11px; color: var(--ink-3); }
+
+  .merge-result {
+    background: var(--bg);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .merge-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+
+  .merge-stat-val {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .merge-stat-val.new   { color: #16A34A; }
+  .merge-stat-val.skip  { color: var(--ink-3); }
+  .merge-stat-val.warn  { color: #C2410C; }
+
+  .file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 10px;
+    color: var(--ink-2);
+    margin: 2px;
+  }
+
+  .file-chip .remove {
+    cursor: pointer;
+    color: var(--ink-3);
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .file-chip .remove:hover { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+
+<div class="app">
+  <!-- ══════════════════════ SIDEBAR ══════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L18 6.5V13.5L10 18L2 13.5V6.5L10 2Z" fill="#111110"/>
+          <path d="M10 2L18 6.5L10 11L2 6.5L10 2Z" fill="#111110" opacity=".6"/>
+        </svg>
+      </div>
+      <div class="logo-title">SpecFlow</div>
+      <div class="logo-sub">Especificações e Contextos Para IA</div>
+    </div>
+
+    <div class="sidebar-section-label">Navegação</div>
+
+    <button class="sidebar-btn active" id="nav-all" onclick="setView('all')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1"/>
+        <rect x="9" y="1" width="6" height="6" rx="1"/>
+        <rect x="1" y="9" width="6" height="6" rx="1"/>
+        <rect x="9" y="9" width="6" height="6" rx="1"/>
+      </svg>
+      Todos os Cards
+    </button>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Projetos</div>
+
+    <div class="sidebar-projects" id="sidebar-projects">
+      <!-- injected by JS -->
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <button class="sidebar-btn" onclick="openExportModal()">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 1v9M5 7l3 3 3-3M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
+      </svg>
+      Exportar Markdown
+    </button>
+
+    <button class="sidebar-btn" onclick="openProjectManager()">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/>
+      </svg>
+      Gerenciar Projetos
+    </button>
+
+    <button class="sidebar-btn" onclick="openBackupModal()">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 9l3 3 3-3"/>
+      </svg>
+      Backup / Restaurar
+    </button>
+  </aside>
+
+  <!-- ══════════════════════ MAIN ══════════════════════ -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="topbar-title" id="view-title">Todos os Cards</span>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="6.5" cy="6.5" r="5"/><path d="M10 10l3.5 3.5"/>
+        </svg>
+        <input type="text" class="search-input" placeholder="Buscar…" id="search-input" oninput="renderCards()">
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Novo Card
+        </button>
+      </div>
+    </header>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar" id="filter-bar">
+      <span class="filter-label">Filtrar:</span>
+      <div id="tag-filters"></div>
+      <select class="sort-select" id="sort-select" onchange="renderCards()">
+        <option value="newest">Mais recentes</option>
+        <option value="oldest">Mais antigos</option>
+        <option value="alpha">A → Z</option>
+      </select>
+    </div>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <div class="cards-header">
+        <span class="cards-count" id="cards-count">0 cards</span>
+      </div>
+      <div class="cards-grid" id="cards-grid">
+        <!-- cards rendered by JS -->
+      </div>
+      <div class="empty-state hidden" id="empty-state">
+        <svg class="empty-iso" viewBox="0 0 80 80" fill="none">
+          <path d="M40 8L72 24V56L40 72L8 56V24L40 8Z" stroke="#111" stroke-width="1.5" fill="none"/>
+          <path d="M40 8L72 24L40 40L8 24L40 8Z" stroke="#111" stroke-width="1.5" fill="none"/>
+          <path d="M40 40V72" stroke="#111" stroke-width="1.5"/>
+          <path d="M8 24L40 40" stroke="#111" stroke-width="1.5"/>
+          <path d="M72 24L40 40" stroke="#111" stroke-width="1.5"/>
+        </svg>
+        <div class="empty-title">Nenhum card encontrado</div>
+        <div class="empty-sub">Crie seu primeiro card de especificação ou ajuste os filtros.</div>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Criar Card
+        </button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════ MODAIS ══════════════════════ -->
+
+<!-- Create / Edit Modal -->
+<div class="overlay" id="form-overlay" onclick="handleOverlayClick(event,'form-overlay')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="form-modal-title">Novo Card</span>
+      <button class="btn btn-ghost" onclick="closeModal('form-overlay')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Título -->
+      <div class="field">
+        <label>Título *</label>
+        <input type="text" class="input" id="f-title" placeholder="Ex: Autenticação via OAuth2">
+      </div>
+
+      <!-- Projeto -->
+      <div class="field">
+        <label>Projeto(s)</label>
+        <div class="project-picker" id="project-picker"></div>
+        <span class="field-hint">Selecione projetos. Para criar novos, use <strong>Gerenciar Projetos</strong> na sidebar.</span>
+      </div>
+
+      <!-- Tags -->
+      <div class="field">
+        <label>Tags / Categorias *</label>
+        <div class="tag-picker" id="tag-picker"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">
+          <span class="field-hint">Selecione todas as categorias relevantes para este card.</span>
+          <button type="button" class="btn btn-ghost" style="font-size:10px;padding:3px 8px;color:var(--ink-3);" onclick="openTagManager()">
+            + Nova tag
+          </button>
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="field">
+        <label>Descrição Geral e Conteúdo *</label>
+        <textarea class="textarea" id="f-desc" rows="5" placeholder="Descreva a especificação em detalhe. Suporte a Markdown."></textarea>
+      </div>
+
+      <!-- Definição de Pronto -->
+      <div class="field">
+        <label>Regras de Implementação</label>
+        <textarea class="textarea" id="f-criteria" rows="3" placeholder="Ex:&#10;- [ ] Usuário consegue fazer login com Google&#10;- [ ] Token expira em 24h"></textarea>
+      </div>
+
+      <!-- Prioridade -->
+      <div class="field">
+        <label>Prioridade</label>
+        <select class="select" id="f-priority">
+          <option value="">— Nenhuma —</option>
+          <option value="alta">🔴 Alta</option>
+          <option value="media">🟡 Média</option>
+          <option value="baixa">🟢 Baixa</option>
+        </select>
+      </div>
+
+      <!-- Notas -->
+      <div class="field">
+        <label>Notas / Referências</label>
+        <textarea class="textarea" id="f-notes" rows="2" placeholder="Links, referências, contexto adicional…"></textarea>
+      </div>
+
+      <!-- Depende de -->
+      <div class="field">
+        <label>Depende de</label>
+        <div id="depends-picker" style="display:flex;flex-wrap:wrap;gap:6px;min-height:32px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);"></div>
+        <span class="field-hint">Selecione cards dos quais este depende. Aparece no markdown como referência cruzada.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('form-overlay')">Cancelar</button>
+      <button class="btn btn-lime" onclick="saveCard()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8"/></svg>
+        Salvar Card
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="overlay" id="view-overlay" onclick="handleOverlayClick(event,'view-overlay')">
+  <div class="modal view-modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="view-title-modal">—</span>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-secondary" id="view-edit-btn" onclick="editCurrentCard()">Editar</button>
+        <button class="btn btn-ghost" onclick="closeModal('view-overlay')">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="view-body">
+      <!-- injected -->
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="overlay" id="export-overlay" onclick="handleOverlayClick(event,'export-overlay')">
+  <div class="modal export-modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">Exportar Markdown</span>
+      <button class="btn btn-ghost" onclick="closeModal('export-overlay')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+        <div class="field" style="flex:1;min-width:180px;">
+          <label>Filtrar por Projeto</label>
+          <select class="select" id="export-project-select" onchange="updateExportPreview()">
+            <option value="">Todos os projetos</option>
+          </select>
+        </div>
+        <div class="field" style="flex-shrink:0;">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;">
+            <input type="checkbox" id="export-include-dates" onchange="updateExportPreview()" style="width:14px;height:14px;accent-color:var(--ink);cursor:pointer;">
+            Incluir datas
+          </label>
+          <span class="field-hint" style="margin-top:3px;">Metadados de criação nos cards.</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Pré-visualização</label>
+        <div class="export-preview" id="export-preview">—</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('export-overlay')">Cancelar</button>
+      <button class="btn btn-secondary" onclick="copyMarkdown()" id="copy-md-btn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M3 11V3a1 1 0 011-1h8"/></svg>
+        Copiar
+      </button>
+      <button class="btn btn-lime" onclick="downloadMarkdown()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 1v9M5 7l3 3 3-3M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/></svg>
+        Baixar .md
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Project Manager Modal -->
+<div class="overlay" id="proj-overlay" onclick="handleOverlayClick(event,'proj-overlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:560px">
+    <div class="modal-header">
+      <span class="modal-title">Gerenciar Projetos</span>
+      <button class="btn btn-ghost" onclick="closeModal('proj-overlay')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- New project form -->
+      <div class="field" style="background:var(--bg);border:1px solid var(--border-2);border-radius:var(--radius);padding:14px;gap:12px;display:flex;flex-direction:column;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-2);">Novo Projeto</div>
+        <div class="field">
+          <label>Nome *</label>
+          <input type="text" class="input" id="new-project-input" placeholder="Ex: AgendaMVP" style="background:#fff;">
+        </div>
+        <div class="field">
+          <label>Descrição do Projeto</label>
+          <textarea class="textarea" id="new-project-desc" rows="2" placeholder="Contexto geral, objetivo e público-alvo do projeto…" style="background:#fff;"></textarea>
+        </div>
+        <div class="field">
+          <label>Stack Principal</label>
+          <input type="text" class="input" id="new-project-stack" placeholder="Ex: Django 4.2, PostgreSQL, React, Celery…" style="background:#fff;">
+          <span class="field-hint">Usado como contexto global no topo do markdown exportado.</span>
+        </div>
+        <button class="btn btn-lime" onclick="addNewProjectFull()" style="align-self:flex-start;">+ Criar Projeto</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div id="proj-manager-body"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('proj-overlay')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB — Exportar Markdown -->
+<button class="fab" onclick="openExportModal()" title="Exportar especificações em Markdown">
+  <div class="fab-pulse"></div>
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M8 1v9M5 7l3 3 3-3M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
+  </svg>
+  Exportar .md
+</button>
+
+<!-- Tag Manager Modal -->
+<div class="overlay" id="tag-overlay" onclick="handleOverlayClick(event,'tag-overlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+    <div class="modal-header">
+      <span class="modal-title">Gerenciar Tags</span>
+      <button class="btn btn-ghost" onclick="closeModal('tag-overlay')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Create new tag -->
+      <div class="field">
+        <label>Criar Nova Tag</label>
+        <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
+          <input type="text" class="input" id="new-tag-label" placeholder="Nome da tag…" style="flex:1;min-width:160px;" oninput="updateTagPreview()">
+          <button class="btn btn-lime" onclick="createCustomTag()" style="flex-shrink:0;">+ Criar Tag</button>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="field-hint" style="margin-bottom:8px;">Cor da tag:</div>
+          <div class="tag-color-options" id="tag-color-options"></div>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+          <span class="field-hint">Prévia:</span>
+          <span id="tag-preview" class="tag tag-custom" style="font-size:11px;opacity:.7;">—</span>
+        </div>
+        <span class="field-hint" style="margin-top:6px;">Tags com o mesmo nome não serão duplicadas.</span>
+      </div>
+
+      <div style="height:1px;background:var(--border-2);margin:4px 0 12px;"></div>
+
+      <!-- Custom tags list -->
+      <div class="field">
+        <label>Tags Personalizadas</label>
+        <div id="custom-tags-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('tag-overlay')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Backup / Restore Modal -->
+<div class="overlay" id="backup-overlay" onclick="handleOverlayClick(event,'backup-overlay')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:520px">
+    <div class="modal-header">
+      <span class="modal-title">Backup / Restaurar</span>
+      <button class="btn btn-ghost" onclick="closeModal('backup-overlay')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Exportar -->
+      <div class="field">
+        <label>Exportar dados</label>
+        <p style="font-size:12px;color:var(--ink-2);line-height:1.6;margin-bottom:10px;">
+          Baixa um arquivo <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px;">.json</code> com todos os seus cards, projetos e tags. Guarde-o para transferir para outro dispositivo ou como backup de segurança.
+        </p>
+        <button class="btn btn-primary" onclick="exportBackupJSON()" style="align-self:flex-start;">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M8 2v8M5 7l3 3 3-3M2 12v1a1 1 0 001 1h10a1 1 0 001-1v-1"/></svg>
+          Baixar backup.json
+        </button>
+      </div>
+
+      <div style="height:1px;background:var(--border-2);margin:4px 0;"></div>
+
+      <!-- Importar / Merge -->
+      <div class="field">
+        <label>Importar e mesclar</label>
+        <p style="font-size:12px;color:var(--ink-2);line-height:1.6;margin-bottom:10px;">
+          Selecione um ou mais arquivos <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px;">.json</code> de backup. O app vai comparar o conteúdo com os dados locais e importar <strong>apenas o que ainda não existe</strong> — sem duplicatas.
+        </p>
+
+        <!-- Drop zone -->
+        <div class="dropzone" id="backup-dropzone">
+          <input type="file" id="backup-file-input" accept=".json" multiple
+            onchange="handleBackupFiles(this.files)"
+            ondragover="event.preventDefault();document.getElementById('backup-dropzone').classList.add('drag-over')"
+            ondragleave="document.getElementById('backup-dropzone').classList.remove('drag-over')"
+            ondrop="document.getElementById('backup-dropzone').classList.remove('drag-over')">
+          <div class="dropzone-icon">📂</div>
+          <div class="dropzone-label">Solte os arquivos aqui ou clique para selecionar</div>
+          <div class="dropzone-sub">Múltiplos arquivos .json permitidos</div>
+        </div>
+
+        <!-- Arquivos selecionados -->
+        <div id="backup-file-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:0;"></div>
+      </div>
+
+      <!-- Resultado do merge -->
+      <div id="merge-result-wrap" class="hidden">
+        <div style="height:1px;background:var(--border-2);margin:4px 0 12px;"></div>
+        <div class="field">
+          <label>Resultado da mesclagem</label>
+          <div class="merge-result">
+            <div class="merge-stat">
+              <span>Cards importados</span>
+              <span class="merge-stat-val new" id="mr-cards-new">0</span>
+            </div>
+            <div class="merge-stat">
+              <span>Cards já existentes (ignorados)</span>
+              <span class="merge-stat-val skip" id="mr-cards-skip">0</span>
+            </div>
+            <div class="merge-stat">
+              <span>Projetos importados</span>
+              <span class="merge-stat-val new" id="mr-proj-new">0</span>
+            </div>
+            <div class="merge-stat">
+              <span>Tags personalizadas importadas</span>
+              <span class="merge-stat-val new" id="mr-tags-new">0</span>
+            </div>
+            <div class="merge-stat" id="mr-warn-row" style="display:none;">
+              <span style="color:#C2410C;">⚠ Arquivos com erros</span>
+              <span class="merge-stat-val warn" id="mr-warn">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeBackupModal()">Fechar</button>
+      <button class="btn btn-lime" id="merge-btn" onclick="runMerge()" style="display:none;">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M2 8h12M9 4l4 4-4 4"/></svg>
+        Mesclar dados
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8"/></svg>
+  <span id="toast-msg">Salvo!</span>
+</div>
+
+<!-- ══════════════════════ JS ══════════════════════ -->
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+let state = {
+  cards: [],
+  projects: [],
+  customTags: [],
+  activeTagFilters: [],
+  activeProjectFilter: null,
+  editingId: null,
+  viewingId: null
+};
+
+/* ============================================================
+   TAGS CONFIG
+============================================================ */
+const ALL_TAGS = [
+  { id: 'rf',     label: 'Req. Funcional',     cls: 'tag-rf'    },
+  { id: 'rnf',    label: 'Req. Não-Funcional',  cls: 'tag-rnf'   },
+  { id: 'ui',     label: 'UI / Interface',       cls: 'tag-ui'    },
+  { id: 'ux',     label: 'UX / Experiência',     cls: 'tag-ux'    },
+  { id: 'front',  label: 'Front-end',             cls: 'tag-front' },
+  { id: 'back',   label: 'Back-end',              cls: 'tag-back'  },
+  { id: 'db',     label: 'Banco de Dados',        cls: 'tag-db'    },
+  { id: 'api',    label: 'API / Endpoint',         cls: 'tag-api'   },
+  { id: 'auth',   label: 'Autenticação',           cls: 'tag-auth'  },
+  { id: 'rn',     label: 'Regra de Negócio',       cls: 'tag-rn'    },
+  { id: 'tec',    label: 'Tecnologia',             cls: 'tag-tec'   },
+  { id: 'mvp',    label: 'MVP / Escopo',           cls: 'tag-mvp'   },
+  { id: 'infra',  label: 'Infraestrutura',          cls: 'tag-infra' },
+  { id: 'test',   label: 'Testes / QA',            cls: 'tag-test'  },
+  { id: 'perf',   label: 'Performance',             cls: 'tag-perf'  },
+  { id: 'seg',    label: 'Segurança',              cls: 'tag-seg'   },
+  { id: 'mob',    label: 'Mobile',                 cls: 'tag-mob'   },
+  { id: 'int',    label: 'Integrações',             cls: 'tag-int'   },
+  { id: 'dados',  label: 'Dados / Analytics',       cls: 'tag-dados' },
+  { id: 'devx',   label: 'Dev Experience',          cls: 'tag-devx'  },
+  { id: 'deploy', label: 'Deploy / CI/CD',           cls: 'tag-deploy'},
+  { id: 'doc',    label: 'Documentação',             cls: 'tag-doc'   },
+  { id: 'misc',   label: 'Misc / Outros',            cls: 'tag-misc'  },
+];
+
+const TAG_MAP = {};
+ALL_TAGS.forEach(t => TAG_MAP[t.id] = t);
+
+function rebuildTagMap() {
+  // Re-add all defaults
+  ALL_TAGS.forEach(t => TAG_MAP[t.id] = t);
+  // Add custom tags
+  state.customTags.forEach(t => TAG_MAP[t.id] = t);
+}
+
+const TAG_PALETTE = [
+  { bg:'#EFF6FF', color:'#1D4ED8' },
+  { bg:'#F0FDF4', color:'#15803D' },
+  { bg:'#FFF7ED', color:'#C2410C' },
+  { bg:'#FFF1F2', color:'#BE123C' },
+  { bg:'#F5F3FF', color:'#6D28D9' },
+  { bg:'#ECFDF5', color:'#065F46' },
+  { bg:'#FFFBEB', color:'#92400E' },
+  { bg:'#F0F9FF', color:'#0369A1' },
+  { bg:'#FDF4FF', color:'#7E22CE' },
+  { bg:'#EEF2FF', color:'#3730A3' },
+  { bg:'#FDF2F8', color:'#9D174D' },
+  { bg:'#F1F5F9', color:'#334155' },
+  { bg:'#F1FCF9', color:'#065147' },
+  { bg:'#FAFAF5', color:'#374151' },
+];
+
+let selectedTagColor = TAG_PALETTE[0];
+
+const PROJECT_COLORS = [
+  '#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7',
+  '#DDA0DD','#98D8C8','#F7DC6F','#BB8FCE','#85C1E9'
+];
+
+/* ============================================================
+   PERSISTENCE (localStorage)
+============================================================ */
+function save() {
+  localStorage.setItem('specflow_cards', JSON.stringify(state.cards));
+  localStorage.setItem('specflow_projects', JSON.stringify(state.projects));
+  localStorage.setItem('specflow_custom_tags', JSON.stringify(state.customTags));
+}
+
+function load() {
+  try {
+    const c = localStorage.getItem('specflow_cards');
+    const p = localStorage.getItem('specflow_projects');
+    const ct = localStorage.getItem('specflow_custom_tags');
+    if (c) state.cards = JSON.parse(c);
+    if (p) state.projects = JSON.parse(p);
+    if (ct) state.customTags = JSON.parse(ct);
+    // Rebuild TAG_MAP with custom tags
+    rebuildTagMap();
+  } catch(e) { console.warn('Load error', e); }
+}
+
+/* ============================================================
+   PROJECT HELPERS
+============================================================ */
+function getProject(id) {
+  return state.projects.find(p => p.id === id);
+}
+
+function projectColor(id) {
+  const p = getProject(id);
+  return p ? p.color : '#999';
+}
+
+function addNewProjectFull() {
+  const nameInput = document.getElementById('new-project-input');
+  const descInput = document.getElementById('new-project-desc');
+  const stackInput = document.getElementById('new-project-stack');
+  const name = nameInput.value.trim();
+  if (!name) { showToast('Nome do projeto é obrigatório!'); return; }
+  if (state.projects.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+    showToast('Projeto já existe!'); return;
+  }
+  const id = 'proj_' + Date.now();
+  const color = PROJECT_COLORS[state.projects.length % PROJECT_COLORS.length];
+  state.projects.push({
+    id, name, color,
+    desc: descInput.value.trim(),
+    stack: stackInput.value.trim()
+  });
+  save();
+  nameInput.value = '';
+  descInput.value = '';
+  stackInput.value = '';
+  renderProjectPicker();
+  renderSidebarProjects();
+  renderProjectManagerBody();
+  showToast(`Projeto "${name}" criado!`);
+}
+
+// Keep old addNewProject as alias for inline form in card modal
+function addNewProject() {
+  const input = document.getElementById('new-project-input');
+  if (!input) return;
+  addNewProjectFull();
+}
+
+/* ============================================================
+   VIEW MANAGEMENT
+============================================================ */
+function setView(view) {
+  state.activeProjectFilter = view === 'all' ? null : view;
+  state.activeTagFilters = [];
+  closeMobileSidebar();
+
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-all').classList.toggle('active', view === 'all');
+
+  document.querySelectorAll('.project-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === view);
+  });
+
+  const viewTitle = document.getElementById('view-title');
+  if (view === 'all') {
+    viewTitle.textContent = 'Todos os Cards';
+  } else {
+    const p = getProject(view);
+    viewTitle.textContent = p ? p.name : 'Projeto';
+  }
+
+  renderTagFilters();
+  renderCards();
+}
+
+/* ============================================================
+   SIDEBAR PROJECTS
+============================================================ */
+function renderSidebarProjects() {
+  const container = document.getElementById('sidebar-projects');
+  if (!state.projects.length) {
+    container.innerHTML = '<div style="padding:8px 20px;font-size:11px;color:rgba(255,255,255,.25);font-style:italic">Nenhum projeto ainda</div>';
+    return;
+  }
+  container.innerHTML = state.projects.map(p => {
+    const count = state.cards.filter(c => c.projects && c.projects.includes(p.id)).length;
+    return `
+      <div class="project-item ${state.activeProjectFilter === p.id ? 'active' : ''}"
+           data-id="${p.id}" onclick="setView('${p.id}')">
+        <span class="project-dot" style="background:${p.color}"></span>
+        ${escHtml(p.name)}
+        <span class="project-count">${count}</span>
+      </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   TAG FILTERS
+============================================================ */
+function renderTagFilters() {
+  const usedTagIds = new Set();
+  const cardsToSearch = state.activeProjectFilter
+    ? state.cards.filter(c => c.projects && c.projects.includes(state.activeProjectFilter))
+    : state.cards;
+
+  cardsToSearch.forEach(c => (c.tags || []).forEach(t => usedTagIds.add(t)));
+
+  const container = document.getElementById('tag-filters');
+  // Merge built-in + custom, filter to only used
+  const allTags = [...ALL_TAGS, ...state.customTags];
+  const tags = allTags.filter(t => usedTagIds.has(t.id));
+
+  container.innerHTML = tags.map(t => `
+    <button class="tag-filter ${state.activeTagFilters.includes(t.id) ? 'active' : ''}"
+            onclick="toggleTagFilter('${t.id}')">
+      ${escHtml(t.label)}
+    </button>`).join('');
+}
+
+function toggleTagFilter(id) {
+  const idx = state.activeTagFilters.indexOf(id);
+  if (idx >= 0) state.activeTagFilters.splice(idx, 1);
+  else state.activeTagFilters.push(id);
+  renderTagFilters();
+  renderCards();
+}
+
+/* ============================================================
+   CARDS RENDER
+============================================================ */
+function renderCards() {
+  const grid = document.getElementById('cards-grid');
+  const empty = document.getElementById('empty-state');
+  const countEl = document.getElementById('cards-count');
+  const search = document.getElementById('search-input').value.toLowerCase().trim();
+  const sort = document.getElementById('sort-select').value;
+
+  let cards = [...state.cards];
+
+  // Filter by project
+  if (state.activeProjectFilter) {
+    cards = cards.filter(c => c.projects && c.projects.includes(state.activeProjectFilter));
+  }
+
+  // Filter by tags
+  if (state.activeTagFilters.length) {
+    cards = cards.filter(c => state.activeTagFilters.every(t => (c.tags || []).includes(t)));
+  }
+
+  // Filter by search
+  if (search) {
+    cards = cards.filter(c =>
+      c.title.toLowerCase().includes(search) ||
+      (c.desc || '').toLowerCase().includes(search) ||
+      (c.notes || '').toLowerCase().includes(search)
+    );
+  }
+
+  // Sort
+  if (sort === 'newest') cards.sort((a,b) => b.createdAt - a.createdAt);
+  else if (sort === 'oldest') cards.sort((a,b) => a.createdAt - b.createdAt);
+  else cards.sort((a,b) => a.title.localeCompare(b.title));
+
+  countEl.textContent = `${cards.length} card${cards.length !== 1 ? 's' : ''}`;
+
+  if (!cards.length) {
+    grid.innerHTML = '';
+    grid.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  grid.classList.remove('hidden');
+  empty.classList.add('hidden');
+
+  grid.innerHTML = cards.map((c, i) => renderCardHTML(c, i)).join('');
+}
+
+function renderCardHTML(c, i) {
+  const tags = (c.tags || []).map(id => {
+    const t = TAG_MAP[id];
+    if (!t) return '';
+    const isCustom = !!state.customTags.find(ct => ct.id === id);
+    const style = isCustom ? `style="background:${t.bg};color:${t.color};"` : '';
+    return `<span class="tag ${isCustom ? '' : t.cls}" ${style}>${escHtml(t.label)}</span>`;
+  }).join('');
+
+  const projects = (c.projects || []).map(pid => {
+    const p = getProject(pid);
+    if (!p) return '';
+    return `<span class="card-project">
+      <span class="card-project-dot" style="background:${p.color}"></span>
+      ${escHtml(p.name)}
+    </span>`;
+  }).join('');
+
+  // accent color based on first tag
+  const firstTag = c.tags && c.tags[0] ? TAG_MAP[c.tags[0]] : null;
+  const accentColor = firstTag ? getTagAccentColor(firstTag.id) : 'var(--border)';
+
+  const date = new Date(c.createdAt).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+
+  const priority = c.priority ? {
+    alta:  '🔴',
+    media: '🟡',
+    baixa: '🟢'
+  }[c.priority] || '' : '';
+
+  return `
+  <div class="card" style="animation-delay:${i*30}ms" onclick="viewCard('${c.id}')">
+    <div class="card-accent" style="background:${accentColor}"></div>
+    <div class="card-top">
+      <div class="card-title">${priority ? priority + ' ' : ''}${escHtml(c.title)}</div>
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <button class="action-btn" onclick="editCard('${c.id}')">✎ Editar</button>
+        <button class="action-btn delete" onclick="deleteCard('${c.id}')">✕</button>
+      </div>
+    </div>
+    ${c.desc ? `<div class="card-desc">${escHtml(c.desc)}</div>` : ''}
+    ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+    <div class="card-footer">
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${projects}</div>
+      <span class="card-date">${date}</span>
+    </div>
+  </div>`;
+}
+
+function getTagAccentColor(id) {
+  const map = {
+    rf:'#3B82F6', rnf:'#22C55E', ui:'#F97316', ux:'#F43F5E',
+    front:'#8B5CF6', back:'#10B981', db:'#F59E0B', api:'#0EA5E9',
+    auth:'#D946EF', rn:'#EAB308', tec:'#64748B', mvp:'#EF4444',
+    infra:'#16A34A', test:'#84CC16', perf:'#F59E0B', seg:'#7C3AED',
+    mob:'#0369A1', int:'#059669', dados:'#6366F1', devx:'#EC4899',
+    deploy:'#14B8A6', doc:'#6B7280', misc:'#9CA3AF'
+  };
+  return map[id] || 'var(--border)';
+}
+
+/* ============================================================
+   VIEW CARD
+============================================================ */
+function viewCard(id) {
+  const card = state.cards.find(c => c.id === id);
+  if (!card) return;
+  state.viewingId = id;
+
+  document.getElementById('view-title-modal').textContent = card.title;
+
+  const tags = (card.tags || []).map(tid => {
+    const t = TAG_MAP[tid];
+    const isCustom = !!state.customTags.find(ct => ct.id === tid);
+    const style = isCustom ? `style="background:${t.bg};color:${t.color};"` : '';
+    return t ? `<span class="tag ${isCustom ? '' : t.cls}" ${style}>${escHtml(t.label)}</span>` : '';
+  }).join('');
+
+  const projects = (card.projects || []).map(pid => {
+    const p = getProject(pid);
+    return p ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;background:#f0f0ec;color:#333;">
+      <span style="width:6px;height:6px;border-radius:50%;background:${p.color};display:inline-block;"></span>
+      ${escHtml(p.name)}</span>` : '';
+  }).join('');
+
+  const priority = card.priority ? `<div class="view-meta-item">
+    <span class="view-meta-label">Prioridade</span>
+    <span class="view-meta-value">${{alta:'🔴 Alta',media:'🟡 Média',baixa:'🟢 Baixa'}[card.priority]||'—'}</span>
+  </div>` : '';
+
+  const criteria = card.criteria ? `
+    <div class="field">
+      <label style="font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:#555450;">Regras de Implementação</label>
+      <div class="view-content" style="white-space:pre-wrap;font-size:12px;">${escHtml(card.criteria)}</div>
+    </div>` : '';
+
+  const notes = card.notes ? `
+    <div class="field">
+      <label style="font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:#555450;">Notas / Referências</label>
+      <div class="view-content" style="font-size:12px;">${escHtml(card.notes)}</div>
+    </div>` : '';
+
+  const depends = (card.dependsOn || []).length ? (() => {
+    const depCards = (card.dependsOn || [])
+      .map(did => state.cards.find(d => d.id === did))
+      .filter(Boolean);
+    if (!depCards.length) return '';
+    return `<div class="field">
+      <label style="font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:#555450;">Depende de</label>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;">
+        ${depCards.map(d => `<span
+          onclick="closeModal('view-overlay');setTimeout(()=>viewCard('${d.id}'),150)"
+          style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;background:#F5F5F0;color:#333;border:1px solid #ddd;cursor:pointer;">
+          ↳ ${escHtml(d.title)}
+        </span>`).join('')}
+      </div>
+    </div>`;
+  })() : '';
+
+  const date = new Date(card.createdAt).toLocaleString('pt-BR');
+
+  document.getElementById('view-body').innerHTML = `
+    ${tags ? `<div class="view-tags">${tags}</div>` : ''}
+    ${projects ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;">${projects}</div>` : ''}
+    ${depends}
+    ${card.desc ? `<div class="field">
+      <label style="font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:#555450;">Descrição</label>
+      <div class="view-content">${escHtml(card.desc)}</div>
+    </div>` : ''}
+    ${criteria}
+    ${notes}
+    <div class="view-meta">
+      <div class="view-meta-item">
+        <span class="view-meta-label">Criado em</span>
+        <span class="view-meta-value">${date}</span>
+      </div>
+      ${card.updatedAt ? `<div class="view-meta-item">
+        <span class="view-meta-label">Atualizado em</span>
+        <span class="view-meta-value">${new Date(card.updatedAt).toLocaleString('pt-BR')}</span>
+      </div>` : ''}
+      ${priority}
+    </div>
+  `;
+
+  openModal('view-overlay');
+}
+
+function editCurrentCard() {
+  closeModal('view-overlay');
+  setTimeout(() => editCard(state.viewingId), 150);
+}
+
+/* ============================================================
+   CREATE / EDIT MODAL
+============================================================ */
+let selectedTags = [];
+let selectedProjects = [];
+let selectedDepends = [];
+
+function openCreateModal() {
+  state.editingId = null;
+  selectedTags = [];
+  selectedProjects = [];
+  selectedDepends = [];
+  document.getElementById('form-modal-title').textContent = 'Novo Card';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-criteria').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('f-priority').value = '';
+  renderTagPicker();
+  renderProjectPicker();
+  renderDependsPicker();
+  openModal('form-overlay');
+  setTimeout(() => document.getElementById('f-title').focus(), 200);
+}
+
+function editCard(id) {
+  const card = state.cards.find(c => c.id === id);
+  if (!card) return;
+  state.editingId = id;
+  selectedTags = [...(card.tags || [])];
+  selectedProjects = [...(card.projects || [])];
+  selectedDepends = [...(card.dependsOn || [])];
+  document.getElementById('form-modal-title').textContent = 'Editar Card';
+  document.getElementById('f-title').value = card.title;
+  document.getElementById('f-desc').value = card.desc || '';
+  document.getElementById('f-criteria').value = card.criteria || '';
+  document.getElementById('f-notes').value = card.notes || '';
+  document.getElementById('f-priority').value = card.priority || '';
+  renderTagPicker();
+  renderProjectPicker();
+  renderDependsPicker();
+  openModal('form-overlay');
+}
+
+function renderTagPicker() {
+  const container = document.getElementById('tag-picker');
+  const allTags = [...ALL_TAGS, ...state.customTags];
+  container.innerHTML = allTags.map(t => {
+    const isCustom = !!state.customTags.find(ct => ct.id === t.id);
+    const style = isCustom ? `style="background:${t.bg};color:${t.color};"` : '';
+    return `<span class="tag-pick-item ${isCustom ? '' : t.cls} ${selectedTags.includes(t.id) ? 'selected' : ''}"
+          ${style}
+          onclick="toggleTag('${t.id}')">
+      ${escHtml(t.label)}
+    </span>`;
+  }).join('');
+}
+
+function toggleTag(id) {
+  const i = selectedTags.indexOf(id);
+  if (i >= 0) selectedTags.splice(i, 1);
+  else selectedTags.push(id);
+  renderTagPicker();
+}
+
+function renderProjectPicker() {
+  const container = document.getElementById('project-picker');
+  if (!state.projects.length) {
+    container.innerHTML = '<span style="font-size:11px;color:#999;font-style:italic">Nenhum projeto criado ainda. Use o campo abaixo.</span>';
+    return;
+  }
+  container.innerHTML = state.projects.map(p => `
+    <span class="project-chip ${selectedProjects.includes(p.id) ? 'selected' : ''}"
+          onclick="toggleProjectSelect('${p.id}')">
+      <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block;"></span>
+      ${escHtml(p.name)}
+    </span>`).join('');
+}
+
+function toggleProjectSelect(id) {
+  const i = selectedProjects.indexOf(id);
+  if (i >= 0) selectedProjects.splice(i, 1);
+  else selectedProjects.push(id);
+  renderProjectPicker();
+}
+
+function renderDependsPicker() {
+  const container = document.getElementById('depends-picker');
+  const currentId = state.editingId;
+  const otherCards = state.cards.filter(c => c.id !== currentId);
+
+  if (!otherCards.length) {
+    container.innerHTML = '<span style="font-size:11px;color:#999;font-style:italic;">Nenhum outro card disponível ainda.</span>';
+    return;
+  }
+
+  container.innerHTML = otherCards.map(c => {
+    const sel = selectedDepends.includes(c.id);
+    return `<span
+      onclick="toggleDepend('${c.id}')"
+      style="
+        display:inline-flex;align-items:center;gap:5px;
+        padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;
+        border:1px solid ${sel ? 'var(--ink)' : 'var(--border)'};
+        background:${sel ? 'var(--ink)' : 'var(--bg)'};
+        color:${sel ? 'var(--lime)' : 'var(--ink-2)'};
+        transition:all .12s;user-select:none;
+      ">
+      ${sel ? '↳ ' : ''}${escHtml(c.title)}
+    </span>`;
+  }).join('');
+}
+
+function toggleDepend(id) {
+  const i = selectedDepends.indexOf(id);
+  if (i >= 0) selectedDepends.splice(i, 1);
+  else selectedDepends.push(id);
+  renderDependsPicker();
+}
+
+function saveCard() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { showToast('Título é obrigatório!'); return; }
+
+  const now = Date.now();
+
+  if (state.editingId) {
+    const card = state.cards.find(c => c.id === state.editingId);
+    card.title = title;
+    card.desc = document.getElementById('f-desc').value.trim();
+    card.criteria = document.getElementById('f-criteria').value.trim();
+    card.notes = document.getElementById('f-notes').value.trim();
+    card.priority = document.getElementById('f-priority').value;
+    card.tags = [...selectedTags];
+    card.projects = [...selectedProjects];
+    card.dependsOn = [...selectedDepends];
+    card.updatedAt = now;
+  } else {
+    state.cards.push({
+      id: 'card_' + now,
+      title,
+      desc: document.getElementById('f-desc').value.trim(),
+      criteria: document.getElementById('f-criteria').value.trim(),
+      notes: document.getElementById('f-notes').value.trim(),
+      priority: document.getElementById('f-priority').value,
+      tags: [...selectedTags],
+      projects: [...selectedProjects],
+      dependsOn: [...selectedDepends],
+      createdAt: now,
+    });
+  }
+
+  save();
+  closeModal('form-overlay');
+  renderCards();
+  renderTagFilters();
+  renderSidebarProjects();
+  showToast(state.editingId ? 'Card atualizado!' : 'Card criado!');
+  state.editingId = null;
+}
+
+/* ============================================================
+   DELETE CARD
+============================================================ */
+function deleteCard(id) {
+  if (!confirm('Apagar este card? Esta ação não pode ser desfeita.')) return;
+  state.cards = state.cards.filter(c => c.id !== id);
+  save();
+  renderCards();
+  renderTagFilters();
+  renderSidebarProjects();
+  showToast('Card apagado.');
+}
+
+/* ============================================================
+   EXPORT MARKDOWN
+============================================================ */
+function openExportModal() {
+  const select = document.getElementById('export-project-select');
+  select.innerHTML = '<option value="">Todos os projetos</option>' +
+    state.projects.map(p => `<option value="${p.id}">${escHtml(p.name)}</option>`).join('');
+  updateExportPreview();
+  openModal('export-overlay');
+}
+
+function updateExportPreview() {
+  const projectId = document.getElementById('export-project-select').value;
+  const includeDates = document.getElementById('export-include-dates').checked;
+  const md = generateMarkdown(projectId, includeDates);
+  const preview = document.getElementById('export-preview');
+  const highlighted = md
+    .replace(/^(# .+)$/gm, '<span class="md-h1">$1</span>')
+    .replace(/^(## .+)$/gm, '<span class="md-h2">$1</span>')
+    .replace(/^(### .+)$/gm, '<span class="md-h3">$1</span>')
+    .replace(/\*\*(.+?)\*\*/g, '<span class="md-bold">**$1**</span>')
+    .replace(/`(.+?)`/g, '<span class="md-tag">`$1`</span>');
+  preview.innerHTML = highlighted;
+}
+
+function generateMarkdown(projectId, includeDates) {
+  let cards = [...state.cards];
+
+  if (projectId) {
+    cards = cards.filter(c => c.projects && c.projects.includes(projectId));
+  }
+
+  if (!cards.length) return '> Nenhum card encontrado para os filtros selecionados.';
+
+  const projectObj = projectId ? getProject(projectId) : null;
+  const title = projectObj ? projectObj.name : 'Especificações do Projeto';
+  const now = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+  // ── Header ──────────────────────────────────────────────
+  let md = `# ${title}\n\n`;
+  md += `> Documento gerado pelo **SpecFlow** em ${now}.\n\n`;
+
+  // ── Contexto do Projeto (ponto 4) ──────────────────────
+  if (projectObj) {
+    md += `## Contexto do Projeto\n\n`;
+    if (projectObj.desc) {
+      md += `${projectObj.desc}\n\n`;
+    }
+    if (projectObj.stack) {
+      const stackItems = projectObj.stack.split(',').map(s => s.trim()).filter(Boolean);
+      md += `**Stack principal:** ${stackItems.map(s => `\`${s}\``).join(' · ')}\n\n`;
+    }
+    md += `---\n\n`;
+  }
+
+  // ── Agrupar por tag primária ────────────────────────────
+  const groups = {};
+  cards.forEach(c => {
+    const primaryTag = (c.tags && c.tags[0]) ? c.tags[0] : 'misc';
+    if (!groups[primaryTag]) groups[primaryTag] = [];
+    groups[primaryTag].push(c);
+  });
+
+  const tagOrder = ['mvp','rn','rf','rnf','front','back','ui','ux','api','auth','db','tec','infra','seg','perf','mob','int','dados','devx','deploy','test','doc','misc'];
+  const sortedGroupKeys = Object.keys(groups).sort((a,b) => {
+    const ai = tagOrder.indexOf(a); const bi = tagOrder.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  // ── Índice (ponto 3) ────────────────────────────────────
+  md += `## Índice\n\n`;
+  sortedGroupKeys.forEach(tagId => {
+    const tagInfo = TAG_MAP[tagId] || { label: 'Outros' };
+    const anchor = tagInfo.label.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+    const count = groups[tagId].length;
+    md += `- [${tagInfo.label}](#${anchor}) *(${count} card${count !== 1 ? 's' : ''})*\n`;
+  });
+  md += `\n---\n\n`;
+
+  // ── Seções de cards ─────────────────────────────────────
+  sortedGroupKeys.forEach(tagId => {
+    const tagInfo = TAG_MAP[tagId] || { label: 'Outros' };
+    const count = groups[tagId].length;
+    md += `## ${tagInfo.label} *(${count} card${count !== 1 ? 's' : ''})*\n\n`;
+
+    // Ordenar por conectividade
+    const groupCards = groups[tagId].sort((a,b) => {
+      const sharedA = (a.tags||[]).filter(t => groups[tagId].some(c => c.id !== a.id && (c.tags||[]).includes(t))).length;
+      const sharedB = (b.tags||[]).filter(t => groups[tagId].some(c => c.id !== b.id && (c.tags||[]).includes(t))).length;
+      return sharedB - sharedA;
+    });
+
+    groupCards.forEach(c => {
+      md += `### ${c.title}\n\n`;
+
+      // Tags
+      const tagLabels = (c.tags||[]).map(t => TAG_MAP[t]?.label || t);
+      if (tagLabels.length) {
+        md += `**Tags:** ${tagLabels.map(l => `\`${l}\``).join(' · ')}\n\n`;
+      }
+
+      // Priority
+      if (c.priority) {
+        const pMap = { alta:'Alta 🔴', media:'Média 🟡', baixa:'Baixa 🟢' };
+        md += `**Prioridade:** ${pMap[c.priority] || c.priority}\n\n`;
+      }
+
+      // Projects — só exibe se for exportação geral (multi-projeto)
+      if (!projectId) {
+        const projNames = (c.projects||[]).map(pid => getProject(pid)?.name).filter(Boolean);
+        if (projNames.length) {
+          md += `**Projetos:** ${projNames.join(', ')}\n\n`;
+        }
+      }
+
+      // Dependências (ponto 2)
+      if (c.dependsOn && c.dependsOn.length) {
+        const depTitles = c.dependsOn
+          .map(did => state.cards.find(d => d.id === did)?.title)
+          .filter(Boolean);
+        if (depTitles.length) {
+          md += `**Depende de:** ${depTitles.map(t => `[${t}]`).join(', ')}\n\n`;
+        }
+      }
+
+      // Description
+      if (c.desc) {
+        md += `${c.desc}\n\n`;
+      }
+
+      // Criteria
+      if (c.criteria) {
+        md += `**Regras de Implementação:**\n\n${c.criteria}\n\n`;
+      }
+
+      // Notes
+      if (c.notes) {
+        md += `**Notas / Referências:**\n\n> ${c.notes.split('\n').join('\n> ')}\n\n`;
+      }
+
+      // Data (ponto 7 — opcional)
+      if (includeDates && c.createdAt) {
+        const date = new Date(c.createdAt).toLocaleDateString('pt-BR');
+        md += `*Criado em: ${date}*\n\n`;
+      }
+
+      md += `---\n\n`;
+    });
+  });
+
+  return md.trim();
+}
+
+function downloadMarkdown() {
+  const projectId = document.getElementById('export-project-select').value;
+  const includeDates = document.getElementById('export-include-dates').checked;
+  const md = generateMarkdown(projectId, includeDates);
+  const projectObj = projectId ? getProject(projectId) : null;
+  const filename = (projectObj ? projectObj.name.replace(/\s+/g,'_') : 'especificacoes') + '_specflow.md';
+
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Markdown baixado!');
+  closeModal('export-overlay');
+}
+
+function copyMarkdown() {
+  const projectId = document.getElementById('export-project-select').value;
+  const includeDates = document.getElementById('export-include-dates').checked;
+  const md = generateMarkdown(projectId, includeDates);
+  navigator.clipboard.writeText(md).then(() => {
+    const btn = document.getElementById('copy-md-btn');
+    const original = btn.innerHTML;
+    btn.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M2 8l4 4 8-8"/></svg> Copiado!`;
+    btn.style.color = '#fff';
+    btn.style.background = 'var(--ink)';
+    btn.style.borderColor = 'var(--ink)';
+    showToast('Markdown copiado para a área de transferência!');
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.style.color = '';
+      btn.style.background = '';
+      btn.style.borderColor = '';
+    }, 2200);
+  }).catch(() => {
+    showToast('Erro ao copiar — use Baixar .md');
+  });
+}
+
+
+/* ============================================================
+   PROJECT MANAGER
+============================================================ */
+function openProjectManager() {
+  renderProjectManagerBody();
+  openModal('proj-overlay');
+}
+
+function renderProjectManagerBody() {
+  const body = document.getElementById('proj-manager-body');
+  if (!state.projects.length) {
+    body.innerHTML = '<p style="color:#999;font-size:12px;font-style:italic;padding:4px 0;">Nenhum projeto criado ainda.</p>';
+    return;
+  }
+  body.innerHTML = `
+    <div style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px;">Projetos cadastrados</div>
+    ${state.projects.map(p => {
+      const count = state.cards.filter(c => c.projects && c.projects.includes(p.id)).length;
+      return `
+      <div style="padding:12px;border:1px solid var(--border-2);border-radius:var(--radius);margin-bottom:8px;background:var(--bg);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:${p.color};flex-shrink:0;"></span>
+          <span style="flex:1;font-size:13px;font-family:var(--font-display);font-weight:700;">${escHtml(p.name)}</span>
+          <span style="font-size:10px;color:var(--ink-3);background:var(--surface);border:1px solid var(--border);padding:2px 7px;border-radius:10px;">${count} cards</span>
+          <button class="btn btn-danger" style="padding:3px 8px;font-size:10px;" onclick="deleteProject('${p.id}')">✕ Apagar</button>
+        </div>
+        ${p.stack ? `<div style="font-size:11px;color:var(--ink-2);margin-bottom:4px;"><span style="color:var(--ink-3);font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;">Stack</span>${escHtml(p.stack)}</div>` : ''}
+        ${p.desc ? `<div style="font-size:11px;color:var(--ink-3);line-height:1.5;">${escHtml(p.desc)}</div>` : ''}
+      </div>`;
+    }).join('')}`;
+}
+
+function deleteProject(id) {
+  const p = getProject(id);
+  if (!p) return;
+  if (!confirm(`Apagar projeto "${p.name}"? Os cards não serão apagados, apenas a associação com este projeto.`)) return;
+  state.projects = state.projects.filter(pr => pr.id !== id);
+  state.cards.forEach(c => {
+    if (c.projects) c.projects = c.projects.filter(pid => pid !== id);
+  });
+  save();
+  renderSidebarProjects();
+  renderProjectManagerBody();
+  if (state.activeProjectFilter === id) setView('all');
+  showToast('Projeto apagado.');
+}
+
+/* ============================================================
+   MODAL UTILS
+============================================================ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function handleOverlayClick(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ============================================================
+   UTILS
+============================================================ */
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ============================================================
+   TAG MANAGER
+============================================================ */
+function openTagManager() {
+  selectedTagColor = TAG_PALETTE[0];
+  renderTagColorPalette();
+  renderCustomTagsList();
+  document.getElementById('new-tag-label').value = '';
+  document.getElementById('tag-preview').textContent = '—';
+  document.getElementById('tag-preview').style.background = TAG_PALETTE[0].bg;
+  document.getElementById('tag-preview').style.color = TAG_PALETTE[0].color;
+  openModal('tag-overlay');
+}
+
+function renderTagColorPalette() {
+  const container = document.getElementById('tag-color-options');
+  container.innerHTML = TAG_PALETTE.map((c, i) => `
+    <span class="tag-color-swatch ${selectedTagColor === c ? 'selected' : ''}"
+          style="background:${c.bg};border-color:${c.color};"
+          onclick="selectTagColor(${i})"
+          title="${c.color}"></span>`).join('');
+}
+
+function selectTagColor(idx) {
+  selectedTagColor = TAG_PALETTE[idx];
+  renderTagColorPalette();
+  updateTagPreview();
+}
+
+function updateTagPreview() {
+  const label = document.getElementById('new-tag-label').value.trim();
+  const preview = document.getElementById('tag-preview');
+  preview.textContent = label || '—';
+  preview.style.background = selectedTagColor.bg;
+  preview.style.color = selectedTagColor.color;
+  preview.style.opacity = label ? '1' : '.5';
+}
+
+function createCustomTag() {
+  const labelInput = document.getElementById('new-tag-label');
+  const label = labelInput.value.trim();
+  if (!label) { showToast('Digite um nome para a tag!'); return; }
+
+  // Check duplicates across built-in + custom
+  const allTags = [...ALL_TAGS, ...state.customTags];
+  const dupe = allTags.find(t => t.label.toLowerCase() === label.toLowerCase());
+  if (dupe) { showToast('Essa tag já existe!'); return; }
+
+  const id = 'ctag_' + Date.now();
+  const newTag = {
+    id,
+    label,
+    cls: 'tag-custom',
+    bg: selectedTagColor.bg,
+    color: selectedTagColor.color,
+    isCustom: true
+  };
+
+  state.customTags.push(newTag);
+  TAG_MAP[id] = newTag;
+  save();
+
+  labelInput.value = '';
+  document.getElementById('tag-preview').textContent = '—';
+  renderTagColorPalette();
+  renderCustomTagsList();
+  renderTagPicker();
+  renderTagFilters();
+  showToast(`Tag "${label}" criada!`);
+}
+
+function renderCustomTagsList() {
+  const container = document.getElementById('custom-tags-list');
+  if (!state.customTags.length) {
+    container.innerHTML = '<span style="font-size:11px;color:#999;font-style:italic;">Nenhuma tag personalizada ainda.</span>';
+    return;
+  }
+  container.innerHTML = state.customTags.map(t => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-2);">
+      <span class="tag" style="background:${t.bg};color:${t.color};font-size:11px;">${escHtml(t.label)}</span>
+      <span style="flex:1;font-size:10px;color:var(--ink-3);">ID: ${t.id}</span>
+      <button class="btn btn-danger" style="padding:3px 8px;font-size:10px;" onclick="deleteCustomTag('${t.id}')">✕ Apagar</button>
+    </div>`).join('');
+}
+
+function deleteCustomTag(id) {
+  const tag = state.customTags.find(t => t.id === id);
+  if (!tag) return;
+  if (!confirm(`Apagar a tag "${tag.label}"? Ela será removida de todos os cards que a usam.`)) return;
+
+  state.customTags = state.customTags.filter(t => t.id !== id);
+  delete TAG_MAP[id];
+
+  // Remove from all cards
+  state.cards.forEach(c => {
+    if (c.tags) c.tags = c.tags.filter(tid => tid !== id);
+  });
+
+  save();
+  renderCustomTagsList();
+  renderTagPicker();
+  renderTagFilters();
+  renderCards();
+  showToast('Tag apagada.');
+}
+
+/* ============================================================
+   BACKUP / RESTORE
+============================================================ */
+let pendingBackupFiles = []; // { name, data } parsed JSONs ready to merge
+
+function openBackupModal() {
+  pendingBackupFiles = [];
+  renderFileChips();
+  document.getElementById('merge-result-wrap').classList.add('hidden');
+  document.getElementById('merge-btn').style.display = 'none';
+  document.getElementById('backup-file-input').value = '';
+  openModal('backup-overlay');
+}
+
+function closeBackupModal() {
+  pendingBackupFiles = [];
+  closeModal('backup-overlay');
+}
+
+/* ── Exportar ── */
+function exportBackupJSON() {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    cards:      state.cards,
+    projects:   state.projects,
+    customTags: state.customTags
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `specflow-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup exportado!');
+}
+
+/* ── Receber arquivos ── */
+function handleBackupFiles(fileList) {
+  const files = Array.from(fileList);
+  let pending = files.length;
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        // aceita tanto o formato novo { version, cards, ... } quanto um dump direto
+        const normalized = {
+          cards:      Array.isArray(data.cards)      ? data.cards      : [],
+          projects:   Array.isArray(data.projects)   ? data.projects   : [],
+          customTags: Array.isArray(data.customTags) ? data.customTags : [],
+          _error: false,
+          _name: file.name
+        };
+        pendingBackupFiles.push(normalized);
+      } catch {
+        pendingBackupFiles.push({ _error: true, _name: file.name, cards: [], projects: [], customTags: [] });
+      }
+      pending--;
+      if (pending === 0) {
+        renderFileChips();
+        document.getElementById('merge-result-wrap').classList.add('hidden');
+        document.getElementById('merge-btn').style.display =
+          pendingBackupFiles.some(f => !f._error) ? 'inline-flex' : 'none';
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+function renderFileChips() {
+  const wrap = document.getElementById('backup-file-chips');
+  if (!pendingBackupFiles.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = pendingBackupFiles.map((f, i) => `
+    <span class="file-chip" style="${f._error ? 'border-color:#FCA5A5;color:#C2410C;' : ''}">
+      ${f._error ? '⚠ ' : '✓ '}${escHtml(f._name)}
+      <span class="remove" onclick="removeBackupFile(${i})">✕</span>
+    </span>`).join('');
+}
+
+function removeBackupFile(i) {
+  pendingBackupFiles.splice(i, 1);
+  renderFileChips();
+  const hasValid = pendingBackupFiles.some(f => !f._error);
+  document.getElementById('merge-btn').style.display = hasValid ? 'inline-flex' : 'none';
+  if (!pendingBackupFiles.length) {
+    document.getElementById('merge-result-wrap').classList.add('hidden');
+  }
+}
+
+/* ── Mesclar ── */
+function runMerge() {
+  const existingCardIds = new Set(state.cards.map(c => c.id));
+  const existingProjIds = new Set(state.projects.map(p => p.id));
+  const existingTagIds  = new Set(state.customTags.map(t => t.id));
+
+  // Também deduplica por título de card para casos onde o id mudou mas o conteúdo é o mesmo
+  const existingCardTitles = new Set(state.cards.map(c => c.title.trim().toLowerCase()));
+
+  let cardsNew  = 0, cardsSkip = 0;
+  let projNew   = 0, tagsNew   = 0, errorFiles = 0;
+
+  pendingBackupFiles.forEach(f => {
+    if (f._error) { errorFiles++; return; }
+
+    // Cards — deduplicação por ID e por título
+    f.cards.forEach(c => {
+      if (existingCardIds.has(c.id) || existingCardTitles.has((c.title||'').trim().toLowerCase())) {
+        cardsSkip++;
+      } else {
+        state.cards.push(c);
+        existingCardIds.add(c.id);
+        existingCardTitles.add((c.title||'').trim().toLowerCase());
+        cardsNew++;
+      }
+    });
+
+    // Projetos — deduplicação por ID e por nome
+    const existingProjNames = new Set(state.projects.map(p => p.name.trim().toLowerCase()));
+    f.projects.forEach(p => {
+      if (existingProjIds.has(p.id) || existingProjNames.has((p.name||'').trim().toLowerCase())) return;
+      state.projects.push(p);
+      existingProjIds.add(p.id);
+      existingProjNames.add((p.name||'').trim().toLowerCase());
+      projNew++;
+    });
+
+    // Tags personalizadas — deduplicação por ID e por label
+    const existingTagLabels = new Set(state.customTags.map(t => t.label.trim().toLowerCase()));
+    f.customTags.forEach(t => {
+      if (existingTagIds.has(t.id) || existingTagLabels.has((t.label||'').trim().toLowerCase())) return;
+      state.customTags.push(t);
+      TAG_MAP[t.id] = t;
+      existingTagIds.add(t.id);
+      existingTagLabels.add((t.label||'').trim().toLowerCase());
+      tagsNew++;
+    });
+  });
+
+  // Persiste e re-renderiza
+  save();
+  rebuildTagMap();
+  renderCards();
+  renderTagFilters();
+  renderSidebarProjects();
+
+  // Exibe resultado
+  document.getElementById('mr-cards-new').textContent  = cardsNew;
+  document.getElementById('mr-cards-skip').textContent = cardsSkip;
+  document.getElementById('mr-proj-new').textContent   = projNew;
+  document.getElementById('mr-tags-new').textContent   = tagsNew;
+  const warnRow = document.getElementById('mr-warn-row');
+  if (errorFiles > 0) {
+    document.getElementById('mr-warn').textContent = errorFiles;
+    warnRow.style.display = 'flex';
+  } else {
+    warnRow.style.display = 'none';
+  }
+
+  document.getElementById('merge-result-wrap').classList.remove('hidden');
+  document.getElementById('merge-btn').style.display = 'none';
+
+  // Limpa arquivos processados
+  pendingBackupFiles = [];
+  renderFileChips();
+  document.getElementById('backup-file-input').value = '';
+
+  const msg = cardsNew > 0
+    ? `${cardsNew} card${cardsNew !== 1 ? 's' : ''} importado${cardsNew !== 1 ? 's' : ''}!`
+    : 'Nenhum dado novo encontrado.';
+  showToast(msg);
+}
+
+/* ============================================================
+   MOBILE SIDEBAR
+============================================================ */
+function toggleMobileSidebar() {
+  const sidebar  = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const isOpen   = sidebar.classList.contains('mobile-open');
+  isOpen ? closeMobileSidebar() : openMobileSidebar();
+}
+
+function openMobileSidebar() {
+  document.querySelector('.sidebar').classList.add('mobile-open');
+  document.getElementById('sidebar-backdrop').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-backdrop').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+function init() {
+  load();
+  renderSidebarProjects();
+  renderTagFilters();
+  renderCards();
+
+  // keyboard shortcut: N = new card
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      ['form-overlay','view-overlay','export-overlay','proj-overlay','tag-overlay','backup-overlay'].forEach(closeModal);
+    }
+    if (e.key === 'n' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName === 'BODY') {
+      openCreateModal();
+    }
+  });
+}
+
+init();
+
+// ── Service Worker (PWA) ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
