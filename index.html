@@ -1161,6 +1161,13 @@
       </svg>
       Backup / Restaurar
     </button>
+
+    <button class="sidebar-btn" id="install-pwa-btn" onclick="installPWA()" style="display: none;">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 1v9M5 7l3 3 3-3M2 12h12a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1v-2a1 1 0 011-1z"/>
+      </svg>
+      Instalar App
+    </button>
   </aside>
 
   <!-- ══════════════════════ MAIN ══════════════════════ -->
@@ -2765,6 +2772,34 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
+
+// ── PWA Install Prompt ──
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('install-pwa-btn');
+  if (btn) btn.style.display = 'flex';
+});
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      console.log('PWA instalado com sucesso');
+    }
+    deferredPrompt = null;
+    const btn = document.getElementById('install-pwa-btn');
+    if (btn) btn.style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const btn = document.getElementById('install-pwa-btn');
+  if (btn) btn.style.display = 'none';
+});
 </script>
 </body>
 </html>
